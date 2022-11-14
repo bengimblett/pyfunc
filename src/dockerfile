@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/azure-functions/python:4-python3.8
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+COPY requirements.txt /
+RUN pip install -r /requirements.txt
+COPY . /home/site/wwwroot
+
+
+# docker build --tag <>.azurecr.io/begimfuncpydemo:latest . 
+# docker run -p 8080:80 -it <>.azurecr.io/begimfuncpydemo:latest 
+# http://localhost:8080/api/HttpTrigger1?name=ben2
+# docker login <>.azurecr.io
+# docker push <>.azurecr.io/begimfuncpydemo:latest 
