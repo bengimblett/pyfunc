@@ -5,9 +5,20 @@ param storageAccountName string = 'fnstor${uniqueString(resourceGroup().id)}'
 param dockerRegistry string ='begim'
 param imageSha string = 'begimfuncpydemo:latest'
 
-
+param logAnalyticsWorkspaceId string
 @secure()
 param password string 
+
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: '${functionAppName}_ai'
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    Flow_Type: 'Bluefield'
+    WorkspaceResourceId: logAnalyticsWorkspaceId
+  }
+}
 
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
@@ -34,6 +45,13 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   }
 }
 
+
+
+
+resource webHostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
+  name: 'begimpyappfromportal'
+  location: location
+}
 */
 
 resource webHostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
@@ -52,7 +70,6 @@ resource webHostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
     zoneRedundant: false
   }
 }
-
 
 // It has not been possible to deploy this successfully through bicep
 // The function app will deploy and look all right, but the DOCKER will
@@ -124,6 +141,10 @@ resource FunctionApp 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
           value: 'https://${dockerRegistry}.azurecr.io'
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
         }
       ]
     }
